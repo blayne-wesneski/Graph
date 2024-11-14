@@ -31,9 +31,9 @@ public class Graph {
         for(Node n : nodes){
             System.out.print(n + " -> ");
             for(Edge e : n.edges){
-                System.out.print(e);
+                System.out.println(e);
             }
-            System.out.println();
+            System.out.println("");
         }
     }
 }
