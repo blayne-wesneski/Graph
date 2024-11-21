@@ -4,9 +4,13 @@ public class Node {
     // BASICS
     public String name;
     public LinkedList<Edge> edges;// Adjancency list
+
+    //PRIMS
     public boolean visited;
 
-    // TODO: more to come
+    //DIJKSTRA
+    public int distance;
+    public Node prev;
 
     public Node(String name) {
         this.name = name;

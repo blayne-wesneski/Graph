@@ -19,7 +19,5 @@ public class GraphDemo {
         g.addEdge(a, c, 4);
 
         g.print();
-
-        g.prim();
     }
 }
