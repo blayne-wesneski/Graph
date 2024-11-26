@@ -74,6 +74,7 @@ public class Graph {
      * Dijkstra's algorithm - get path with minimal cost from start to end
      */
     public void dijkstra(Node start, Node end) {
+
         // init
         unvisitAllNodes();
         resetDistanceData();
@@ -119,10 +120,131 @@ public class Graph {
                 path.push(curr);
                 curr = curr.prev;
             }
-            while(!path.isEmpty()) {
+            while (!path.isEmpty()) {
                 Node n = path.pop();
                 pl(n + " (" + n.distance + ")");
             }
+        }
+    }
+
+    /**
+     * A* algorithm - find a shortest path through a graph using a heuristic
+     * 
+     * @return
+     */
+
+    public void aStar(Node start, Node end) {
+        // INIT
+        unvisitAllNodes();
+        resetDistanceData();// g
+        resetPrev();
+        resetAStar();
+
+        // Lists
+        LinkedList<Node> open = new LinkedList<>();
+        LinkedList<Node> closed = new LinkedList<>();
+
+        Node curr = start;
+        curr.h = manhattanDistance(curr, end);// heuristic calc
+        curr.f = 0 + curr.h;// f + h
+
+        boolean done = false;
+        while (!done) {
+            pl("Current node is " + curr);
+
+            // examine all edges
+            for (Edge e : curr.edges) {
+                pl("\tExamine edge " + e);
+
+                Node dest = e.end;
+
+                if (!open.contains(dest) && !closed.contains(dest)) {
+                    pl("\t\t" + dest + " is not in open or closed. Add to open.");
+                    open.add(dest);
+                }
+
+                // Calc A* data
+                int g = curr.distance + e.weight;
+                int h = manhattanDistance(dest, end);// Calc heuristic on the fly
+                int f = g + h;
+                pl("\t\tg= " + g + ", h= " + h + ", f= " + f);
+
+                pl("\t\tComparing " + dest + " f (" + dest.f + ") to new f (" + f + ")");
+                if (f < dest.f) {
+                    dest.distance = g;
+                    dest.h = h;
+                    dest.f = f;
+                    dest.prev = curr;
+                    pl("\t\tSmaller f calculated... updating " + dest + "; g= " + g + ", h= " + h + ", f= " + f);
+                }
+
+                if (dest == end) {
+                    done = true;
+                    break;
+                }
+            } // close edge loop
+
+            printAStarTable();
+            pl("Open: " + open);
+            pl("Closed: " + closed);
+
+            closed.add(curr);
+
+            // update curr
+            curr = getNodeWithLowestFOpen(open);
+
+        } // closes 'done' loop
+
+        // TODO: PATH- same as dijkstra's...
+
+    }
+
+    private void printAStarTable() {
+        pl("");
+        System.out.printf("%-15s%-15s%-15s%-15s%-15s\n", "NAME", "DIST(G)", "H", "F", "PREV");
+        for (int i = 0; i < nodes.size(); i++) {
+            Node node = nodes.get(i);
+            System.out.printf("%-15s", node);
+            System.out.printf("%-15s", node.distance);
+            System.out.printf("%-15s", node.h);
+            System.out.printf("%-15s", node.f);
+            System.out.printf("%-15s", node.prev);
+            pl("");
+        }
+    }
+
+    private Node getNodeWithLowestFOpen(LinkedList<Node> list) {
+        int min = Integer.MAX_VALUE;
+        Node candidate = null;
+
+        for (Node n : list) {
+            if (n.f < min) {
+                min = n.f;
+                candidate = n;
+            }
+        }
+
+        return candidate;
+    }
+
+    private int manhattanDistance(Node from, Node goal) {
+        int dx = Math.abs(from.x - goal.x);
+        int dy = Math.abs(from.y - goal.y);
+
+        return dx + dy;
+    }
+
+    private void resetAStar() {
+        for (Node n : nodes) {
+            n.distance = 0;
+            n.h = 0;
+            n.f = Integer.MAX_VALUE;
+        }
+    }
+
+    private void resetPrev() {
+        for (Node n : nodes) {
+            n.prev = null;
         }
     }
 
